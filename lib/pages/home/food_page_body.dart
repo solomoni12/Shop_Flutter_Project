@@ -1,10 +1,14 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:shop_app/utils/colors.dart';
 import 'package:shop_app/utils/dimensions.dart';
 import 'package:shop_app/widgets/big_text.dart';
 
+import '../../controller/popular_product_controller.dart';
+import '../../models/product_model.dart';
+import '../../utils/app_constant.dart';
 import '../../widgets/app_column.dart';
 import '../../widgets/icon_and_text_widget.dart';
 import '../../widgets/small_text.dart';
@@ -42,28 +46,36 @@ class _FoodPageBodyState extends State<FoodPageBody> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          // color: Colors.redAccent,
-          height: Dimensions.pageView,
-          child: PageView.builder(
-              controller: pageController,
-              itemCount: 5,
-              itemBuilder: (context, postion) {
-                return _buildPageItem(postion);
-              }),
-        ),
-        DotsIndicator(
-          dotsCount: 5,
-          position: _currPageValue,
-          decorator: DotsDecorator(
-            activeColor: AppColors.mainColor,
-            size: const Size.square(9.0),
-            activeSize: const Size(18.0, 9.0),
-            activeShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5.0)),
-          ),
-        ),
-
+        GetBuilder<PopularProductController>(builder: (popularProducts) {
+          return popularProducts.isLoaded?Container(
+            // color: Colors.redAccent,
+            height: Dimensions.pageView,
+            child: PageView.builder(
+                controller: pageController,
+                itemCount: popularProducts.popularProductList.length,
+                itemBuilder: (context, postion) {
+                  return _buildPageItem(
+                      postion, popularProducts.popularProductList[postion]);
+                }),
+          ): CircularProgressIndicator(
+            color: AppColors.mainColor,
+          );
+        }),
+        GetBuilder<PopularProductController>(builder: (popularProducts) {
+          return DotsIndicator(
+            dotsCount: popularProducts.popularProductList.isEmpty
+                ? 1
+                : popularProducts.popularProductList.length,
+            position: _currPageValue,
+            decorator: DotsDecorator(
+              activeColor: AppColors.mainColor,
+              size: const Size.square(9.0),
+              activeSize: const Size(18.0, 9.0),
+              activeShape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5.0)),
+            ),
+          );
+        }),
         SizedBox(
           height: Dimensions.height30,
         ),
@@ -178,7 +190,7 @@ class _FoodPageBodyState extends State<FoodPageBody> {
     );
   }
 
-  Widget _buildPageItem(int index) {
+  Widget _buildPageItem(int index, ProductModel popularProduct) {
     Matrix4 matrix = new Matrix4.identity();
     if (index == _currPageValue.floor()) {
       var currScale = 1 - (_currPageValue - index) * (1 - _scaleFactory);
@@ -214,12 +226,16 @@ class _FoodPageBodyState extends State<FoodPageBody> {
             margin: EdgeInsets.only(
                 left: Dimensions.width10, right: Dimensions.width10),
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(Dimensions.radius30),
-                color: index.isEven ? Color(0xFF69c5df) : Color(0xFF9294cc),
-                image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: AssetImage(
-                        "assets/image/ea9367e8a16f1d3e41d4a3ae9af2baff.png"))),
+              borderRadius: BorderRadius.circular(Dimensions.radius30),
+              color: index.isEven ? Color(0xFF69c5df) : Color(0xFF9294cc),
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                image: NetworkImage(
+                  AppConstants.BASE_URL+"/uploads/"+popularProduct.img!
+                  // "assets/image/ea9367e8a16f1d3e41d4a3ae9af2baff.png",
+                ),
+              ),
+            ),
           ),
           Align(
             alignment: Alignment.bottomCenter,
@@ -252,7 +268,9 @@ class _FoodPageBodyState extends State<FoodPageBody> {
                   left: Dimensions.width5,
                   right: Dimensions.width5,
                 ),
-                child: AppColumn(text: "Chinise Side",),
+                child: AppColumn(
+                  text: popularProduct.name!,
+                ),
               ),
             ),
           )
