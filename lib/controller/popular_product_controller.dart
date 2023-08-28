@@ -18,6 +18,7 @@ print(response.statusCode);
         print("got product");
         _popularProductList=[];
         _popularProductList.addAll(Product.fromJson(response.body).products);
+        print(_popularProductList);
         update();
       }else{
 
