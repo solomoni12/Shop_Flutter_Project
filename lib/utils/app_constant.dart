@@ -5,7 +5,7 @@ class AppConstants {
   static const String BASE_URL = "http://127.0.0.1:8000";
   static const String POPULAR_PRODUCT_URI = "/api/popular";
   static const String RECOMMENDED_PRODUCT_URI = "/api/recommended";
-
+  static const String UPLOAD_URL = "/uploads/";   
   // static const String BASE_URL = "http://127.0.0.1:8000";
   // static const String POPULAR_PRODUCT_URI = "/api/popular";
   // static const String RECOMMENDED_PRODUCT_URI = "/api/recommended";
