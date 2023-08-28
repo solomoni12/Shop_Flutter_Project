@@ -7,7 +7,7 @@ import '../data/repository/popular_product_rep.dart';
 Future<void> init()async {
 
   // apiclient
-  Get.lazyPut(() => ApiClient(appBaseUrl:"https://mvs.bslmeiyu.com"));
+  Get.lazyPut(() => ApiClient(appBaseUrl:"http://127.0.0.1:8000"));
 
 // repository 
   Get.lazyPut(() => PopularProductRepo(apiClient:Get.find()));
